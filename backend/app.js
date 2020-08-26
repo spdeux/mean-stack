@@ -1,20 +1,28 @@
+const path = require('path')
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
-
-const postsRoutes = require('./routes/post')
+const postsRoutes = require("./routes/post");
 
 const app = express();
 
-mongoose.connect('mongodb+srv://sepideh:fuJONNTzMd5gh29H@cluster0.ekeuh.mongodb.net/node-angular?retryWrites=true&w=majority').then(() => {
-    console.log('connected to database!')
-}).catch(() => {
-    console.log('connection failed!')
-});
+mongoose
+    .connect(
+        "mongodb+srv://sepideh:fuJONNTzMd5gh29H@cluster0.ekeuh.mongodb.net/node-angular?retryWrites=true&w=majority", { useNewUrlParser: true, useUnifiedTopology: true }
+    )
+    .then(() => {
+        console.log("connected to database!");
+    })
+    .catch(() => {
+        console.log("connection failed!");
+    });
 
 //apply all incoming requests
 app.use(bodyParser.json());
+
+//use static middlware to make the images folder statically accessible
+app.use("/images", express.static(path.join("backend/images")))
 
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");

@@ -44,39 +44,57 @@ router.post(
                 post: {
                     ...createdPost,
                     id: createdPost._id,
-
                 },
             });
         });
     }
 );
 
-router.put("/:id", multer({ storage: storage }).single("image"), (req, res, next) => {
-    let imagePath = req.body.imagePath;
-    if (req.file) {
-        const url = req.protocol + "://" + req.get("host");
-        imagePath = url + "/images/" + req.file.filename;
-    }
-    const post = new Post({
-        _id: req.body.id,
-        title: req.body.title,
-        content: req.body.content,
-        imagePath: imagePath
-    });
-    Post.updateOne({ _id: req.params.id }, post).then((result) => {
-        res.status(200).json({
-            message: "updated successfully!",
+router.put(
+    "/:id",
+    multer({ storage: storage }).single("image"),
+    (req, res, next) => {
+        let imagePath = req.body.imagePath;
+        if (req.file) {
+            const url = req.protocol + "://" + req.get("host");
+            imagePath = url + "/images/" + req.file.filename;
+        }
+        const post = new Post({
+            _id: req.body.id,
+            title: req.body.title,
+            content: req.body.content,
+            imagePath: imagePath,
         });
-    });
-});
+        Post.updateOne({ _id: req.params.id }, post).then((result) => {
+            res.status(200).json({
+                message: "updated successfully!",
+            });
+        });
+    }
+);
 
 router.get("", (req, res, next) => {
-    Post.find().then((documents) => {
-        res.status(200).json({
-            message: "post fetched successfully!",
-            posts: documents,
+    const pageSize = +req.query.pagesize;
+    const currentPage = +req.query.page;
+    const postQuery = Post.find();
+    let fetchedPosts;
+
+    if (currentPage && pageSize) {
+        postQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
+    }
+
+    postQuery
+        .then((documents) => {
+            this.fetchedPosts = documents;
+            return Post.count(); //maximum posts in database
+        })
+        .then((count) => {
+            res.status(200).json({
+                message: "post fetched successfully!",
+                posts: this.fetchedPosts,
+                maxPosts: count,
+            });
         });
-    });
 });
 
 router.get("/:id", (req, res, next) => {

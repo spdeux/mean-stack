@@ -28,6 +28,7 @@ export class PostsService {
                 content: post.content,
                 id: post._id,
                 imagePath: post.imagePath,
+                creator: post.creator,
               };
             }),
             maxPosts: postData.maxPosts,
@@ -54,6 +55,7 @@ export class PostsService {
       title: string;
       content: string;
       imagePath: string;
+      creator: string;
     }>(`http://localhost:3000/api/posts/${id}`);
   }
 
@@ -69,15 +71,6 @@ export class PostsService {
         postData
       )
       .subscribe((responseData) => {
-        //add post locally
-        // const post: Post = {
-        //   id: responseData.post.id,
-        //   title: title,
-        //   content: content,
-        //   imagePath: responseData.post.imagePath,
-        // };
-        // this.posts.push(post);
-        // this.postsUpdated.next([...this.posts]);
         this.router.navigate(["/"]);
       });
   }
@@ -96,34 +89,17 @@ export class PostsService {
         title: title,
         content: content,
         imagePath: image,
+        creator: null,
       };
     }
     this.http
       .put(`http://localhost:3000/api/posts/${id}`, postData)
       .subscribe((response) => {
-        //update post locally
-        // const updatedPosts = [...this.posts];
-        // const oldPostIndex = updatedPosts.findIndex((p) => p.id === id);
-        // const post: Post = {
-        //   id: id,
-        //   title: title,
-        //   content: content,
-        //   imagePath: "",
-        // };
-        // updatedPosts[oldPostIndex] = post;
-        // this.posts = updatedPosts;
-        // this.postsUpdated.next([...this.posts]);
         this.router.navigate(["/"]);
       });
   }
 
   deletePost(postId: string) {
     return this.http.delete(`http://localhost:3000/api/posts/${postId}`);
-    // .subscribe(() => {
-    //   //delete post locally
-    //   const updatedPosts = this.posts.filter((p) => p.id != postId);
-    //   this.posts = updatedPosts;
-    //   this.postsUpdated.next([...this.posts]);
-    // });
   }
 }

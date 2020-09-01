@@ -49,6 +49,10 @@ router.post(
                     id: createdPost._id,
                 },
             });
+        }).catch(error => {
+            res.status(500).json({
+                message: "creating a post failed!"
+            });
         });
     }
 );
@@ -80,7 +84,11 @@ router.put(
                     message: "not authorized!",
                 });
             }
-        });
+        }).catch(error => {
+            res.status(500).json({
+                message: "updating a post failed!"
+            });
+        });;
     }
 );
 
@@ -97,13 +105,17 @@ router.get("", (req, res, next) => {
     postQuery
         .then((documents) => {
             this.fetchedPosts = documents;
-            return Post.count(); //maximum posts in database
+            return Post.countDocuments(); //maximum posts in database
         })
         .then((count) => {
             res.status(200).json({
                 message: "post fetched successfully!",
                 posts: this.fetchedPosts,
                 maxPosts: count,
+            });
+        }).catch(error => {
+            res.status(500).json({
+                message: "fetching posts failed!"
             });
         });
 });
@@ -117,7 +129,11 @@ router.get("/:id", (req, res, next) => {
                 message: "post not found",
             });
         }
-    });
+    }).catch(error => {
+        res.status(500).json({
+            message: "fetching the post failed!"
+        });
+    });;
 });
 
 router.delete("/:id", checkAuth, (req, res, next) => {
@@ -133,7 +149,11 @@ router.delete("/:id", checkAuth, (req, res, next) => {
             });
         }
 
-    });
+    }).catch(error => {
+        res.status(500).json({
+            message: "deleting posts failed!"
+        });
+    });;
 });
 
 module.exports = router;
